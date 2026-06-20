@@ -20,6 +20,10 @@ const logger = require('./app/config/logger');
 // Créer l'application Express
 const app = express();
 
+// Fait confiance au proxy de Render pour récupérer la vraie IP du client
+// (nécessaire pour que express-rate-limit fonctionne correctement)
+app.set('trust proxy', 1);
+
 // ============ MIDDLEWARES GLOBAUX ============
 
 // Sécurité
