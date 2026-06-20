@@ -30,8 +30,24 @@ app.set('trust proxy', 1);
 app.use(helmet());
 
 // CORS
+// CORS
+const allowedOrigins = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(',').map((o) => o.trim())
+  : '*';
+
+console.log('CORS_ORIGIN brut:', JSON.stringify(process.env.CORS_ORIGIN));
+console.log('Origines autorisées (après trim):', allowedOrigins);
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : '*',
+  origin: (origin, callback) => {
+    console.log('Origin reçue dans une requête:', JSON.stringify(origin));
+    if (!origin || allowedOrigins === '*' || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('❌ Origine refusée:', JSON.stringify(origin));
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
